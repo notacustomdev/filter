@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     string indata, outdata, filterdata;
 
     of_filter of;
-    int fd, n;
+    int fdin, fdout, n, m;
     // Shut GetOpt error messages down (return '?'): 
     opterr = 0;
 
@@ -44,10 +44,24 @@ int main(int argc, char** argv) {
 
     char buf[of.h.length];
 
-    fd = open(indata.c_str(), O_RDONLY);
+    char *bptr = &buf[0];
+    fdin = open(indata.c_str(), O_RDONLY);
+    fdout = open(outdata.c_str(), O_WRONLY | O_CREAT);
+    int req_b=of.h.length;
 
-    while( (n = read(fd, buf, of.h.length) ) > 0)
+    while( (n = read(fdin, bptr, req_b) ) > 0){
         cout << "read: " << n << "bytes\n";
+        m = write(fdout, bptr, n);
+        cout << "wrote: " << m << "bytes\n";
+        bptr = &buf[n];
+        req_b = (of.h.length - n);
+        if(req_b==0)
+            req_b = of.h.length;
+        if(bptr == &buf[of.h.length])
+            bptr = &buf[0];
+    }
 
+    close(fdin);
+    close(fdout);
     return 0;
 }
