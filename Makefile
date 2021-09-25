@@ -1,16 +1,16 @@
-#IDIR =../include
+IDIR =.
 CC=g++
 #CFLAGS=-I$(IDIR)
 
 ODIR=obj
 LDIR =lib
 
-LIBS=-lm
+LIBS=-lm -lgsl -lgslcblas
 
-_DEPS = #hellomake.h
+_DEPS = filter.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o 
+_OBJ = main.o filter.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

@@ -1,2 +1,3 @@
 filter
 obj/main.o
+obj/filter.o

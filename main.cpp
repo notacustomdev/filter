@@ -2,39 +2,37 @@
 #include <string>
 #include <iostream>
 #include <unistd.h>
-
+#include <cstdio>
+#include <fcntl.h>
+#include <sys/stat.h>
 // Namespaces:
 using namespace std;
 
+#include "filter.h"
+
 int main(int argc, char** argv) {
     int opt;
-    string input = "";
-    bool flagA = false;
-    bool flagB = false;
+    string indata, outdata, filterdata;
 
-    // Retrieve the (non-option) argument:
-    if ( (argc <= 1) || (argv[argc-1] == NULL) || (argv[argc-1][0] == '-') ) {  // there is NO input...
-        cerr << "No argument provided!" << endl;
-        //return 1;
-    }
-    else {  // there is an input...
-        input = argv[argc-1];
-    }
-
-    // Debug:
-    cout << "input = " << input << endl;
-
+    of_filter of;
+    int fd, n;
     // Shut GetOpt error messages down (return '?'): 
     opterr = 0;
 
     // Retrieve the options:
-    while ( (opt = getopt(argc, argv, "ab")) != -1 ) {  // for each option...
+    while ( (opt = getopt(argc, argv, "i:o:f:")) != -1 ) {  // for each option...
         switch ( opt ) {
-            case 'a':
-                    flagA = true;
+            case 'i':
+                    indata = optarg;
+                    cout << "input: " << indata << endl;
                 break;
-            case 'b':
-                    flagB = true;
+            case 'o':
+                    outdata = optarg;
+                    cout << "output: " << outdata << endl;
+                break;
+            case 'f':
+                    filterdata = optarg;
+                    cout << "filterfile: " << filterdata << endl;
                 break;
             case '?':  // unknown option...
                     cerr << "Unknown option: '" << char(optopt) << "'!" << endl;
@@ -42,9 +40,14 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Debug:
-    cout << "flagA = " << flagA << endl;
-    cout << "flagB = " << flagB << endl;
+    of = load_filter(filterdata.c_str());
+
+    char buf[of.h.length];
+
+    fd = open(indata.c_str(), O_RDONLY);
+
+    while( (n = read(fd, buf, of.h.length) ) > 0)
+        cout << "read: " << n << "bytes\n";
 
     return 0;
 }
