@@ -1,2 +1,2 @@
-filter/obj/main.o
-filter/filter
+filter
+obj/main.o
