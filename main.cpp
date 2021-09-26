@@ -10,12 +10,17 @@ using namespace std;
 
 #include "filter.h"
 
+void short_to_double(short *in, double *out, size_t n){
+    for(size_t i = 0; i < n; i++)
+        out[i] = 10.*in[i]/32767.;
+}
+
 int main(int argc, char** argv) {
     int opt;
     string jsondata, filterdata;
 
     of_filter of;
-    int fdin, fdout, n, m;
+    int n, m;
     // Shut GetOpt error messages down (return '?'): 
     opterr = 0;
 
@@ -36,21 +41,23 @@ int main(int argc, char** argv) {
 
     of = load_filter(filterdata.c_str());
 
-    char buf[2*of.h.length];
-
-    char *bptr = &buf[0];
+    short rawbuff[of.h.length];
+    double conv_buff[of.h.length];
+    short *bptr = &rawbuff[0];
     
-    int req_b=of.h.length;
+    int req_b=of.h.length*sizeof(short);
 
-    while( (n = read(STDIN_FILENO, bptr, req_b) ) > 0){
-        m = write(STDOUT_FILENO, bptr, n);
-        bptr = &buf[n];
-        req_b = (of.h.length - n);
-        if(req_b==0)
-            req_b = of.h.length;
-        if(bptr == &buf[of.h.length])
-            bptr = &buf[0];
+    while( (n = read(STDIN_FILENO, (char*)bptr, req_b) ) > 0){
+        m = write(STDOUT_FILENO, (char*)bptr, n);
+        bptr = &rawbuff[n % of.h.length];
+        req_b = n % of.h.length*sizeof(short);
+        if(req_b==0){
+            req_b = of.h.length*sizeof(short);
+            //short_to_double(rawbuff, conv_buff, of.h.length);
+        }
     }
 
     return 0;
 }
+
+
