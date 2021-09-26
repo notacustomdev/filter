@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
     int opt;
-    string indata, outdata, filterdata;
+    string jsondata, filterdata;
 
     of_filter of;
     int fdin, fdout, n, m;
@@ -20,39 +20,30 @@ int main(int argc, char** argv) {
     opterr = 0;
 
     // Retrieve the options:
-    while ( (opt = getopt(argc, argv, "i:o:f:")) != -1 ) {  // for each option...
+    while ( (opt = getopt(argc, argv, "j:f:")) != -1 ) {  // for each option...
         switch ( opt ) {
-            case 'i':
-                    indata = optarg;
-                    cout << "input: " << indata << endl;
-                break;
-            case 'o':
-                    outdata = optarg;
-                    cout << "output: " << outdata << endl;
+            case 'j':
+                    jsondata = optarg;
                 break;
             case 'f':
                     filterdata = optarg;
-                    cout << "filterfile: " << filterdata << endl;
                 break;
             case '?':  // unknown option...
                     cerr << "Unknown option: '" << char(optopt) << "'!" << endl;
-                break;
+                return 0;
         }
     }
 
     of = load_filter(filterdata.c_str());
 
-    char buf[of.h.length];
+    char buf[2*of.h.length];
 
     char *bptr = &buf[0];
-    fdin = open(indata.c_str(), O_RDONLY);
-    fdout = open(outdata.c_str(), O_WRONLY | O_CREAT);
+    
     int req_b=of.h.length;
 
-    while( (n = read(fdin, bptr, req_b) ) > 0){
-        cout << "read: " << n << "bytes\n";
-        m = write(fdout, bptr, n);
-        cout << "wrote: " << m << "bytes\n";
+    while( (n = read(STDIN_FILENO, bptr, req_b) ) > 0){
+        m = write(STDOUT_FILENO, bptr, n);
         bptr = &buf[n];
         req_b = (of.h.length - n);
         if(req_b==0)
@@ -61,7 +52,5 @@ int main(int argc, char** argv) {
             bptr = &buf[0];
     }
 
-    close(fdin);
-    close(fdout);
     return 0;
 }

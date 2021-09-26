@@ -53,8 +53,6 @@ struct of_filter load_filter(const char* filename){
   int buf_int;
 
   float *buf_float;
-  
-  printf("reading from: %s\n", filename);
 
   filter_file = fopen(filename, "r");
 
@@ -67,8 +65,6 @@ struct of_filter load_filter(const char* filename){
   
   f.h.length = buf_int;
 
-  printf("Size of zero padded filter: %d\n", f.h.length);
-
   f.h.h = new double[buf_int];
   f.std = new double[buf_int/2];
   f.nps = new double[buf_int/4+1];
@@ -77,15 +73,11 @@ struct of_filter load_filter(const char* filename){
   
   fread((char*) &buf_int, sizeof(int),1,filter_file);
 
-  printf("Filter number: %d\n", buf_int);
-
   fread((char*) &buf_int, sizeof(int),1,filter_file);
 
   f.h.name = new char[buf_int];
 
   fread((char*) f.h.name, sizeof(char),buf_int,filter_file);
-
-  printf("Name of the filter: %s\n", f.h.name);
 
   fread((char*) buf_float, sizeof(float),f.h.length,filter_file);
 
@@ -93,8 +85,6 @@ struct of_filter load_filter(const char* filename){
     f.h.h[i] = (double) buf_float[i];
   
   fread((char*) &buf_int, sizeof(int),1,filter_file);
-
-  printf("Number of standard event: %d\n", buf_int);
 
   fread((char*) buf_float, sizeof(float),f.h.length/2,filter_file);
 
