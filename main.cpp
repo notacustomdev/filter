@@ -48,12 +48,12 @@ int main(int argc, char** argv) {
     int req_b=of.h.length*sizeof(short);
 
     while( (n = read(STDIN_FILENO, (char*)bptr, req_b) ) > 0){
-        m = write(STDOUT_FILENO, (char*)bptr, n);
         bptr = &rawbuff[n % of.h.length];
         req_b = n % of.h.length*sizeof(short);
         if(req_b==0){
             req_b = of.h.length*sizeof(short);
-            //short_to_double(rawbuff, conv_buff, of.h.length);
+            short_to_double(rawbuff, conv_buff, of.h.length);
+            m = write(STDOUT_FILENO, (char*)bptr, n);
         }
     }
 
