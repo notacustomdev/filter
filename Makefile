@@ -1,6 +1,6 @@
-IDIR =.
+IDIR = /rapidjson/include .
 CC=g++
-#CFLAGS=-I$(IDIR)
+CFLAGS=$(IDIR:%=-I%)
 
 ODIR=obj
 LDIR =lib
